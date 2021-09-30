@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pl"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Sieciufka</title>
+	<style>
+		body{
+			font-family: 'Courier New';
+		}
+	</style>
+</head>
+	<body>
+	<h2>SiecioHaker v1.0</h2>
+	Adres: <input id="adres" type="text" value="195.67.23.0">
+	<br><br>Maska: <input id="maska" type="text" value="24">
+	<br><br>Liczba podsieci: <input id="ile" type="text" value="2">
+	<br><br><button id="doit">Zrób to!</button>
+	<br><br><div id="bin"></div>
+	<div id="msk"></div>
+	<div id="roz"></div>
+	<script>
+	
+		var btn = document.getElementById("doit");
+		
+		function fnc(){
+			var adres = document.getElementById("adres").value;
+			var maska = 32 - Number.parseInt(document.getElementById("maska").value);
+			var ile = Number.parseInt(document.getElementById("ile").value);
+			
+			maska = maska - ((ile-1) >>> 0).toString(2).length;
+			
+			var bn = document.getElementById("bin");
+			var mk = document.getElementById("msk");
+			var tad = adres.split("\.");
+			var tas = "";
+			for(var i = tad.length-1; i >= 0; i--){
+				if(i == tad.length-1){
+					tas = tas + binar(tad[i]);
+				}else{
+					tas = binar(tad[i]) + "." + tas;
+				}
+				console.log(tad[i]);
+			}
+			bn.innerHTML = "Zapis binarny:<br>" + tas;
+			
+			var tmsk = "";
+			for(var i = 32; i > 0; i--){
+				if(i % 8 == 0){
+					tmsk = "." + tmsk;
+				}
+				var co = "1";
+				if(i >= 32-maska){
+					co = "0";
+				}
+				tmsk = co + tmsk;
+			}
+			mk.innerHTML = tmsk.substring(0,35);
+			
+			console.log("Split: "+tas.replaceAll(".", ""));
+			var adresValue = Number.parseInt(tas.replaceAll(".", ""), 2);
+			console.log("Value: "+adresValue);
+			var roz = document.getElementById("roz");
+			roz.innerHTML = "";
+			for(var i = 0; i < ile; i++){
+				
+				/*var br = document.getElementById("br"+(i+1));
+				var as = document.getElementById("as"+(i+1));
+				var ar = document.getElementById("ar"+(i+1));
+				var zk = document.getElementById("zk"+(i+1));
+				var ht = document.getElementById("ht"+(i+1));
+				*/
+				var br = (i >>> 0).toString(2);
+				while(br.length < (ile-1 >>> 0).toString(2).length){
+					br = "0"+br;
+				}
+				br = "Binarnie: " + br;
+				
+				var as = "Adres sieciowy: " + adrToStr(adresValue + (Math.pow(2, maska)*i));
+				var ar = "Adres rozgłoszeniowy: " + adrToStr(adresValue + (Math.pow(2, maska)*(i+1)-1));
+				
+				var zk = "Zakres: " + adrToStr(adresValue + (Math.pow(2, maska)*i)+1) + " - " + adrToStr(adresValue + (Math.pow(2, maska)*(i+1)-1-1));
+				
+				var ht = innerHTML = "Liczba hostów:<br>&nbsp;&nbsp;1. sposób: 2^(32-" + (32 - maska)  + ")-2 = " + (Math.pow(2, maska)-2)
+					+ "<br>&nbsp;&nbsp;2. sposób: " + (Math.pow(2, maska)) + "-2 = "+(Math.pow(2, maska)-2);
+				
+				var all = "<h3>Podsieć #" + (i+1) + "</h3>" + br + "<br>" + as + "<br>" + ar + "<br>" + zk + "<br>" + ht;
+				
+				
+				roz.innerHTML = roz.innerHTML + all + "<br>";
+			}
+			
+		}
+		
+		function adrToStr(adresValue){
+			adresValue = binar(adresValue);
+			while(adresValue.length < 32){
+				adresValue = "0"+adresValue;
+			}
+			var a1 = Number.parseInt((""+adresValue).substring(24, 32), 2);
+			var a2 = Number.parseInt((""+adresValue).substring(16, 24), 2);
+			var a3 = Number.parseInt((""+adresValue).substring(8, 16), 2);
+			var a4 = Number.parseInt((""+adresValue).substring(0, 8), 2);
+			
+			return a4 + "." + a3 + "." + a2 + "." + a1;
+		}
+		
+		function binar(num){
+			var st = (num >>> 0).toString(2);
+			st = ""+st;
+			
+			while(st.length < 8){
+				st = "0"+st;
+			}
+			return st;
+		}
+		
+		btn.addEventListener("click", fnc);
+		
+	</script>
+
+</body></html>
